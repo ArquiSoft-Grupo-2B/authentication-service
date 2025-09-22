@@ -1,29 +1,18 @@
-from dataclasses import dataclass
+from pydantic import BaseModel, EmailStr, Field
+from typing import Optional
 
-@dataclass
-class User:
-    id: str
-    email: str
+class User(BaseModel):
+    id: str = Field(..., description="Identificador único del usuario")
+    email: EmailStr
     alias: str
     password: str
-    photo_url: str|None = None
+    photo_url: Optional[str] = None
 
     def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "email": self.email,
-            "alias": self.alias,
-            "password": self.password,
-            "photo_url": self.photo_url
-        }
-    
+        """Incluye la contraseña"""
+        return self.model_dump()
+
     def to_dict_no_password(self) -> dict:
-        return {
-            "id": self.id,
-            "email": self.email,
-            "alias": self.alias,
-            "photo_url": self.photo_url
-        }
-    
-
-
+        """Excluye la contraseña"""
+        return self.model_dump(exclude={"password"})
+ 

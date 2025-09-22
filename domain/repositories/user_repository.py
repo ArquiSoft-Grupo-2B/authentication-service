@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 from domain.entities.user import User
 
+
 class UserRepository(ABC):
     @abstractmethod
     def add_user(self, user: User) -> None:
@@ -9,12 +10,12 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def get_user_by_id(self, user_id: str) -> User|None:
+    def get_user_by_id(self, user_id: str) -> User | None:
         """Retrieve a user by their ID."""
         pass
 
     @abstractmethod
-    def get_user_by_email(self, email: str) -> User|None:
+    def get_user_by_email(self, email: str) -> User | None:
         """Retrieve a user by their email."""
         pass
 

@@ -1,35 +1,28 @@
 from abc import ABC, abstractmethod
-from typing import List
-from domain.entities.user import User
+from typing import Optional
+from ..entities.user import User
 
 
 class UserRepository(ABC):
+
     @abstractmethod
-    def add_user(self, user: User) -> None:
-        """Add a new user to the repository."""
+    def create(
+        self, email: str, password: str, display_name: Optional[str] = None
+    ) -> User:
         pass
 
     @abstractmethod
-    def get_user_by_id(self, user_id: str) -> User | None:
-        """Retrieve a user by their ID."""
+    def find_by_id(self, user_id: str) -> Optional[User]:
         pass
 
     @abstractmethod
-    def get_user_by_email(self, email: str) -> User | None:
-        """Retrieve a user by their email."""
+    def find_by_email(self, email: str) -> Optional[User]:
         pass
 
     @abstractmethod
-    def update_user(self, user: User) -> None:
-        """Update an existing user's information."""
+    def update(self, user: User) -> User:
         pass
 
     @abstractmethod
-    def delete_user(self, user_id: str) -> None:
-        """Delete a user from the repository by their ID."""
-        pass
-
-    @abstractmethod
-    def list_users(self) -> List[User]:
-        """List all users in the repository."""
+    def delete(self, user_id: str) -> None:
         pass

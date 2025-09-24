@@ -44,4 +44,4 @@ class InMemoryUserRepository(UserRepository):
         del self.users[user_id]
 
     def list_users(self):
-        return self.users.values()
+        return list(self.users.values())

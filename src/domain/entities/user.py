@@ -21,7 +21,7 @@ class User:
         if not self.email or not self._is_valid_email(self.email):
             return False
 
-        if self.alias and len(self.alias.strip()) == 0:
+        if self.alias is not None and len(self.alias.strip()) == 0:
             return False
 
         if not self.password or len(self.password) < 8:
@@ -33,3 +33,12 @@ class User:
         """Check if email format is valid."""
         email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.match(email_pattern, email) is not None
+
+    def to_dict_no_password(self) -> dict:
+        """Convert user to dictionary excluding password."""
+        return {
+            "id": self.id,
+            "email": self.email,
+            "alias": self.alias,
+            "photo_url": self.photo_url,
+        }

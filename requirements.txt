@@ -2,3 +2,5 @@ fastapi
 uvicorn
 pydantic
 pydantic[email]
+pytest
+pytest-cov

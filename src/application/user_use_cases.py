@@ -9,14 +9,21 @@ class UserUseCases:
     def __init__(self, user_repository: UserRepository):
         self.user_service = UserService(user_repository)
 
+    def create_user(self, email: str, password: str, alias: str | None = None) -> dict:
+        user = self.user_service.create_user(email, password, alias)
+        return user
+
     def get_user(self, user_id: str) -> dict | None:
         user = self.user_service.get_user(user_id)
-        return user.to_dict_no_password() if user else None
+        return user if user else None
 
     def update_user(self, user_data: dict) -> None:
         user = User(**user_data)
-        self.user_service.validate_user_for_update(user)
-        self.user_service.user_repository.update_user(user)
+        user = self.user_service.update_user(user)
+        return user
+
+    def delete_user(self, user_id: str) -> None:
+        self.user_service.delete_user(user_id)
 
     def list_users(self) -> list[dict]:
         users = self.user_service.list_users()

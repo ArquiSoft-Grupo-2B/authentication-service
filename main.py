@@ -1,8 +1,10 @@
 from fastapi import FastAPI
-from src.api.routes import auth_routes
+from strawberry.fastapi import GraphQLRouter
+from src.infraestructure.graphql.schema import schema
 
 app = FastAPI()
-app.include_router(auth_routes.router)
+graphql_app = GraphQLRouter(schema)
+app.include_router(graphql_app, prefix="/graphql")
 
 @app.get("/")
 def read_root():

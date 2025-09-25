@@ -11,16 +11,16 @@ class UserUseCases:
 
     def create_user(self, email: str, password: str, alias: str | None = None) -> dict:
         user = self.user_service.create_user(email, password, alias)
-        return user
+        return user.to_dict_no_password()
 
     def get_user(self, user_id: str) -> dict | None:
         user = self.user_service.get_user(user_id)
-        return user if user else None
+        return user.to_dict_no_password() if user else None
 
     def update_user(self, user_data: dict) -> None:
         user = User(**user_data)
         user = self.user_service.update_user(user)
-        return user
+        return user.to_dict_no_password() if user else None
 
     def delete_user(self, user_id: str) -> None:
         self.user_service.delete_user(user_id)

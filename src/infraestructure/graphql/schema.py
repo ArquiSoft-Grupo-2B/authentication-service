@@ -1,10 +1,12 @@
 import strawberry
 from src.application.user_use_cases import UserUseCases
 from src.infraestructure.graphql.types import UserType, UserInput
-from src.infraestructure.repositories.in_memory_user_repository import InMemoryUserRepository
+# from src.infraestructure.repositories.in_memory_user_repository import InMemoryUserRepository
+from src.infraestructure.repositories.firebase_user_repository import FirebaseUserRepository
 
 # Inyección de dependencias
-user_repository = InMemoryUserRepository()
+# user_repository = InMemoryUserRepository()
+user_repository = FirebaseUserRepository()
 user_use_cases = UserUseCases(user_repository)
 
 @strawberry.type

@@ -13,6 +13,10 @@ class UserUseCases:
         user = self.user_service.create_user(email, password, alias)
         return user.to_dict_no_password()
 
+    def login_user(self, email: str, password: str) -> dict | None:
+        login_data = self.user_service.login_user(email, password)
+        return login_data.to_dict() if login_data else None
+
     def get_user(self, user_id: str) -> dict | None:
         user = self.user_service.get_user(user_id)
         return user.to_dict_no_password() if user else None

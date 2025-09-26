@@ -22,8 +22,8 @@ class FirebaseAuthAPI:
         url = f"{self.base_url}/accounts:signInWithPassword?key={self.api_key}"
         payload = {"email": email, "password": password, "returnSecureToken": True}
         response = requests.post(url, json=payload)
-
         if response.status_code == 200:
+            print(response.json())
             return response.json()  # Contains idToken, refreshToken, etc.
         else:
             return None

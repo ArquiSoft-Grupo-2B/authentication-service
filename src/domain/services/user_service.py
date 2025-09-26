@@ -1,5 +1,6 @@
 from typing import Optional, List
 from ..entities.user import User
+from ..entities.token import Token
 from ..repositories.user_repository import UserRepository
 
 
@@ -21,7 +22,7 @@ class UserService:
 
         return self.user_repository.create_user(email, password, alias)
 
-    def login_user(self, email: str, password: str) -> Optional[User]:
+    def login_user(self, email: str, password: str) -> Optional[Token]:
         """Log in a user."""
         return self.user_repository.login_user(email, password)
 

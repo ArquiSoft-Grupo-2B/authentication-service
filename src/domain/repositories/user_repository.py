@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 from ..entities.user import User
+from ..entities.token import Token
 
 
 class UserRepository(ABC):
@@ -12,7 +13,7 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def login_user(self, email: str, password: str) -> Optional[User]:
+    def login_user(self, email: str, password: str) -> Optional[Token]:
         pass
 
     @abstractmethod

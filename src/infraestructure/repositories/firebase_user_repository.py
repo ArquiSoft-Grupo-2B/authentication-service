@@ -1,7 +1,9 @@
 from typing import Optional, List
 from src.domain.repositories.user_repository import UserRepository
 from src.domain.entities.user import User
+from src.domain.entities.token import Token
 from src.infraestructure.db.firebase import auth_client, db
+from ..rest.firebase_auth_api import FirebaseAuthAPI
 import firebase_admin
 
 
@@ -33,8 +35,20 @@ class FirebaseUserRepository(UserRepository):
             alias=user_auth.display_name,
         )
 
-    def login_user(self, email: str, password: str) -> Optional[User]:
-        pass
+    def login_user(self, email: str, password: str) -> Optional[Token]:
+        firebase_auth_api = FirebaseAuthAPI()
+        response = firebase_auth_api.login_user(email, password)
+        if response:
+            return Token(
+                local_id=response.get("localId"),
+                email=response.get("email"),
+                alias=response.get("displayName"),
+                id_token=response.get("idToken"),
+                registered=response.get("registered"),
+                refresh_token=response.get("refreshToken"),
+                expires_in=response.get("expiresIn"),
+            )
+        return None
 
     def get_user(self, user_id: str) -> Optional[User]:
         """Get user by ID from Firestore (extra info) + Auth (email)."""

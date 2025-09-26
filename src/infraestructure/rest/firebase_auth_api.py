@@ -23,7 +23,16 @@ class FirebaseAuthAPI:
         payload = {"email": email, "password": password, "returnSecureToken": True}
         response = requests.post(url, json=payload)
         if response.status_code == 200:
-            print(response.json())
             return response.json()  # Contains idToken, refreshToken, etc.
         else:
             return None
+
+    def send_password_reset_email(self, email: str) -> dict:
+        """Send a password reset email to the user."""
+
+        url = f"{self.base_url}/accounts:sendOobCode?key={self.api_key}"
+        payload = {"requestType": "PASSWORD_RESET", "email": email}
+        response = requests.post(url, json=payload)
+        if response.status_code == 200:
+            return {"success": True, "response": response.json().get("email")}
+        return {"success": False, "response": response.json()}

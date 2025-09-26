@@ -25,3 +25,9 @@ class TokenType:
     registered: bool
     refresh_token: str
     expires_in: str
+
+
+@strawberry.type
+class PasswordResetResponse:
+    success: bool
+    response: str

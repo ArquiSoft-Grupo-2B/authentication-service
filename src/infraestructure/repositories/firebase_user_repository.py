@@ -110,6 +110,11 @@ class FirebaseUserRepository(UserRepository):
         except firebase_admin._auth_utils.UserNotFoundError:
             raise ValueError("User not found")
 
+    def send_password_reset_email(self, email: str) -> dict:
+        """Send a password reset email using Firebase Auth REST API."""
+        firebase_auth_api = FirebaseAuthAPI()
+        return firebase_auth_api.send_password_reset_email(email)
+
     def delete_user(self, user_id: str) -> None:
         """Delete user from Auth and Firestore."""
         try:

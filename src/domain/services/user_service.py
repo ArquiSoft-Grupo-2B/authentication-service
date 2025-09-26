@@ -49,6 +49,10 @@ class UserService:
 
         return self.user_repository.update_user(user)
 
+    def send_password_reset_email(self, email: str) -> dict:
+        """Send a password reset email."""
+        return self.user_repository.send_password_reset_email(email)
+
     def delete_user(self, user_id: str) -> None:
         """Delete a user by ID."""
         existing_user = self.user_repository.get_user(user_id)

@@ -1,6 +1,11 @@
 import strawberry
 from src.application.user_use_cases import UserUseCases
-from src.infraestructure.graphql.types import UserType, UserInput, TokenType
+from src.infraestructure.graphql.types import (
+    UserType,
+    UserInput,
+    TokenType,
+    PasswordResetResponse,
+)
 
 # from src.infraestructure.repositories.in_memory_user_repository import InMemoryUserRepository
 from src.infraestructure.repositories.firebase_user_repository import (
@@ -56,6 +61,11 @@ class Mutation:
         if updated_user:
             return UserType(**updated_user)
         return None
+
+    @strawberry.mutation
+    def send_password_reset_email(self, email: str) -> PasswordResetResponse:
+        reset_confirmation = user_use_cases.send_password_reset_email(email)
+        return PasswordResetResponse(**reset_confirmation)
 
     @strawberry.mutation
     def delete_user(self, user_id: str) -> bool:

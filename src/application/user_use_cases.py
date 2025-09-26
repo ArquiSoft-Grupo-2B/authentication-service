@@ -26,6 +26,9 @@ class UserUseCases:
         user = self.user_service.update_user(user)
         return user.to_dict_no_password() if user else None
 
+    def send_password_reset_email(self, email: str) -> dict:
+        return self.user_service.send_password_reset_email(email)
+
     def delete_user(self, user_id: str) -> None:
         self.user_service.delete_user(user_id)
 

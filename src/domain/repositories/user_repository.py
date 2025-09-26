@@ -29,6 +29,10 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
+    def send_password_reset_email(self, email: str) -> dict:
+        pass
+
+    @abstractmethod
     def delete_user(self, user_id: str) -> None:
         pass
 

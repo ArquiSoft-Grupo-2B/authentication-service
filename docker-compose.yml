@@ -1,0 +1,23 @@
+services:
+  authentication-service:
+    build: .
+    container_name: authentication-service
+    ports:
+      - "8000:8000"
+    develop:
+      watch:
+        # Sincroniza tu código fuente automáticamente
+        - action: sync
+          path: .
+          target: /app
+          ignore:
+            - __pycache__/
+            - .venv/
+        # Si cambia requirements.txt, obliga a reconstruir la imagen
+        - action: rebuild
+          path: requirements.txt
+    command: >
+      uvicorn main:app
+      --host 0.0.0.0
+      --port 8000
+      --reload

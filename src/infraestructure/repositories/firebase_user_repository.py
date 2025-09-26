@@ -4,6 +4,7 @@ from src.domain.entities.user import User
 from src.infraestructure.db.firebase import auth_client, db
 import firebase_admin
 
+
 class FirebaseUserRepository(UserRepository):
     """Firebase implementation of UserRepository."""
 
@@ -32,12 +33,17 @@ class FirebaseUserRepository(UserRepository):
             alias=user_auth.display_name,
         )
 
+    def login_user(self, email: str, password: str) -> Optional[User]:
+        pass
+
     def get_user(self, user_id: str) -> Optional[User]:
         """Get user by ID from Firestore (extra info) + Auth (email)."""
         try:
             user_record = auth_client.get_user(user_id)
             doc = db.collection("users").document(user_id).get()
-            alias = doc.to_dict().get("alias") if doc.exists else user_record.display_name
+            alias = (
+                doc.to_dict().get("alias") if doc.exists else user_record.display_name
+            )
             return User(
                 id=user_record.uid,
                 email=user_record.email,
@@ -52,7 +58,9 @@ class FirebaseUserRepository(UserRepository):
         try:
             user_record = auth_client.get_user_by_email(email)
             doc = db.collection("users").document(user_record.uid).get()
-            alias = doc.to_dict().get("alias") if doc.exists else user_record.display_name
+            alias = (
+                doc.to_dict().get("alias") if doc.exists else user_record.display_name
+            )
             return User(
                 id=user_record.uid,
                 email=user_record.email,
@@ -72,10 +80,12 @@ class FirebaseUserRepository(UserRepository):
                 password=user.password if user.password else None,
             )
 
-            db.collection("users").document(user.id).update({
-                "email": user.email,
-                "alias": user.alias,
-            })
+            db.collection("users").document(user.id).update(
+                {
+                    "email": user.email,
+                    "alias": user.alias,
+                }
+            )
 
             return User(
                 id=user_record.uid,
@@ -99,7 +109,9 @@ class FirebaseUserRepository(UserRepository):
         users = []
         for user_record in auth_client.list_users().iterate_all():
             doc = db.collection("users").document(user_record.uid).get()
-            alias = doc.to_dict().get("alias") if doc.exists else user_record.display_name
+            alias = (
+                doc.to_dict().get("alias") if doc.exists else user_record.display_name
+            )
             users.append(
                 User(
                     id=user_record.uid,

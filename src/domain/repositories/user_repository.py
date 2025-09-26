@@ -12,6 +12,10 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
+    def login_user(self, email: str, password: str) -> Optional[User]:
+        pass
+
+    @abstractmethod
     def get_user(self, user_id: str) -> Optional[User]:
         pass
 

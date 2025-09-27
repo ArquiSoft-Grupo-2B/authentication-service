@@ -8,7 +8,7 @@ import firebase_admin
 
 
 class FirebaseUserRepository(UserRepository):
-    """Firebase implementation of UserRepository."""
+    """Firebase implementation of UserRepository. Uses firebase_admin SDK"""
 
     def create_user(
         self, email: str, password: str, alias: Optional[str] = None

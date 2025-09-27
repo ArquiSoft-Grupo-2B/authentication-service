@@ -6,7 +6,7 @@ from ..entities.token import Token
 class TokenRepository(ABC):
 
     @abstractmethod
-    def validate_token(self, token_str: str) -> Optional[Token]:
+    def verify_token(self, id_token: str) -> Optional[Token]:
         pass
 
     @abstractmethod

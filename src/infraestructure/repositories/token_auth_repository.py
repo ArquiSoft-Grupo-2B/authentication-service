@@ -11,7 +11,16 @@ class TokenAuthRepository(TokenRepository):
         try:
             decoded_token = auth.verify_id_token(id_token)
             print(f"Decoded token: {decoded_token}")
-            return decoded_token
+            token_data = {
+                "uid": decoded_token.get("uid"),
+                "email": decoded_token.get("email"),
+                "email_verified": decoded_token.get("email_verified"),
+                "user_info": {
+                    "name": decoded_token.get("name"),
+                    "user_id": decoded_token.get("user_id"),
+                },
+            }
+            return token_data
         except Exception as e:
             print(f"Token verification failed: {e}")
             return None

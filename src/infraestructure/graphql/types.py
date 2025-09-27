@@ -28,6 +28,20 @@ class TokenType:
 
 
 @strawberry.type
+class userInfoType:
+    name: str
+    user_id: str
+
+
+@strawberry.type
+class decodedTokenType:
+    uid: str
+    email: str
+    email_verified: bool
+    user_info: userInfoType
+
+
+@strawberry.type
 class PasswordResetResponse:
     success: bool
     response: str

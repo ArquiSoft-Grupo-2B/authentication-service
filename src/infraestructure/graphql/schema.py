@@ -1,21 +1,27 @@
 import strawberry
 from src.application.user_use_cases import UserUseCases
+from src.application.token_use_cases import TokenUseCases
 from src.infraestructure.graphql.types import (
     UserType,
     UserInput,
     TokenType,
     PasswordResetResponse,
+    userInfoType,
+    decodedTokenType,
 )
 
 # from src.infraestructure.repositories.in_memory_user_repository import InMemoryUserRepository
 from src.infraestructure.repositories.firebase_user_repository import (
     FirebaseUserRepository,
 )
+from src.infraestructure.repositories.token_auth_repository import TokenAuthRepository
 
 # Inyección de dependencias
 # user_repository = InMemoryUserRepository()
 user_repository = FirebaseUserRepository()
+token_repository = TokenAuthRepository()
 user_use_cases = UserUseCases(user_repository)
+token_use_cases = TokenUseCases(token_repository)
 
 
 @strawberry.type
@@ -74,6 +80,18 @@ class Mutation:
             return True
         except Exception:
             return False
+
+    @strawberry.mutation
+    def verify_token(self, id_token: str) -> decodedTokenType | None:
+        token_data = token_use_cases.verify_token(id_token)
+        if token_data:
+            return decodedTokenType(
+                uid=token_data["uid"],
+                email=token_data.get("email"),
+                email_verified=token_data.get("email_verified"),
+                user_info=userInfoType(**token_data.get("user_info")),
+            )
+        return None
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)

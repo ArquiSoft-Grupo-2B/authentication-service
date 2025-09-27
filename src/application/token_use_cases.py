@@ -11,7 +11,7 @@ class TokenUseCases:
 
     def verify_token(self, id_token: str) -> Optional[dict]:
         token = self.token_service.verify_token(id_token)
-        return token.to_dict() if token else None
+        return token if token else None
 
     def refresh_token(
         self, old_token_str: str, new_token_str: str, expires_in: int
@@ -19,4 +19,4 @@ class TokenUseCases:
         token = self.token_service.refresh_token(
             old_token_str, new_token_str, expires_in
         )
-        return token.to_dict()
+        return token

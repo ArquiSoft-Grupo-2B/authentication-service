@@ -69,7 +69,19 @@ API_KEY='tu_api_key_de_firebase'
    - API: http://localhost:8000
    - GraphQL Playground: http://localhost:8000/graphql
 
-### Opción 2: Con Docker
+### Opción 2: Con Docker Compose
+
+Antes de iniciar, asegúrate de tener instalado:
+
+- [Docker](https://docs.docker.com/get-docker/)  
+- [Docker Compose](https://docs.docker.com/compose/)  
+- Una red Docker compartida llamada `routes_shared_network`
+
+Si no existe la red, créala con:
+
+```bash
+docker network create routes_shared_network
+```
 
 1. **Construir y ejecutar con Docker Compose**:
 

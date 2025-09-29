@@ -24,6 +24,9 @@ class UserService:
 
     def login_user(self, email: str, password: str) -> Optional[Token]:
         """Log in a user."""
+        existing_user = self.user_repository.get_user_by_email(email)
+        if not existing_user:
+            raise ValueError("No user found with this email")
         return self.user_repository.login_user(email, password)
 
     def get_user(self, user_id: str) -> Optional[User]:

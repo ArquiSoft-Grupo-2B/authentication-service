@@ -25,7 +25,7 @@ class FirebaseAuthAPI:
         if response.status_code == 200:
             return response.json()  # Contains idToken, refreshToken, etc.
         else:
-            return None
+            raise ValueError("Invalid login credentials")
 
     def send_password_reset_email(self, email: str) -> dict:
         """Send a password reset email to the user."""

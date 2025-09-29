@@ -37,18 +37,20 @@ class FirebaseUserRepository(UserRepository):
 
     def login_user(self, email: str, password: str) -> Optional[Token]:
         firebase_auth_api = FirebaseAuthAPI()
-        response = firebase_auth_api.login_user(email, password)
-        if response:
-            return Token(
-                local_id=response.get("localId"),
-                email=response.get("email"),
-                alias=response.get("displayName"),
-                id_token=response.get("idToken"),
-                registered=response.get("registered"),
-                refresh_token=response.get("refreshToken"),
-                expires_in=response.get("expiresIn"),
-            )
-        return None
+        try:
+            response = firebase_auth_api.login_user(email, password)
+            if response:
+                return Token(
+                    local_id=response.get("localId"),
+                    email=response.get("email"),
+                    alias=response.get("displayName"),
+                    id_token=response.get("idToken"),
+                    registered=response.get("registered"),
+                    refresh_token=response.get("refreshToken"),
+                    expires_in=response.get("expiresIn"),
+                )
+        except ValueError as e:
+            raise ValueError(f"Login failed: {str(e)}")
 
     def get_user(self, user_id: str) -> Optional[User]:
         """Get user by ID from Firestore (extra info) + Auth (email)."""
@@ -65,7 +67,7 @@ class FirebaseUserRepository(UserRepository):
                 alias=alias,
             )
         except firebase_admin._auth_utils.UserNotFoundError:
-            return None
+            raise firebase_admin._auth_utils.UserNotFoundError("User not found")
 
     def get_user_by_email(self, email: str) -> Optional[User]:
         """Get user by email using Auth and Firestore."""

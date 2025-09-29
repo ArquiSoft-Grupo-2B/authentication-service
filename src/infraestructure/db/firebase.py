@@ -3,8 +3,7 @@ from firebase_admin import credentials, firestore, auth
 from dotenv import load_dotenv
 import os
 import json
-
-load_dotenv(dotenv_path="configs/.env")
+load_dotenv()
 firebase_credentials_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
 
 

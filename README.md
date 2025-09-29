@@ -12,12 +12,15 @@ usuarios y autenticación:
 
 - **Gestión de usuarios**: Crear, obtener, actualizar, eliminar y listar
   usuarios
-- **Autenticación**: Login de usuarios con tokens JWT
+- **Autenticación**: Login de usuarios con tokens JWT y autorización mediante
+  headers
 - **Verificación de tokens**: Validación y decodificación de tokens de
   autenticación
 - **Recuperación de contraseña**: Envío de emails para restablecer contraseña
 - **Backend Firebase**: Integración completa con Firebase Authentication y
   Firestore
+- **Autorización por Header**: Sistema de autenticación mediante header
+  `Authorization` con tokens Bearer
 
 ### Arquitectura
 
@@ -95,6 +98,23 @@ docker run -p 8000:8000 authentication-service
 
 El servicio expone una API GraphQL con las siguientes operaciones:
 
+### 🔐 Autenticación
+
+El servicio utiliza autenticación basada en tokens JWT mediante el header
+`Authorization`. Para las operaciones que requieren autenticación, incluye el
+token en el header de la siguiente manera:
+
+```
+Authorization: Bearer <tu_token_jwt>
+```
+
+**Operaciones que requieren autenticación:**
+
+- `updateUser` - Actualizar usuario (usa el ID del token, no requiere parámetro
+  userId)
+- `deleteUser` - Eliminar usuario (usa el ID del token, no requiere parámetro
+  userId)
+
 ### Queries (Consultas)
 
 #### 1. Obtener un usuario específico
@@ -160,12 +180,15 @@ mutation LoginUser {
 }
 ```
 
-#### 3. Actualizar usuario
+#### 3. Actualizar usuario 🔐
+
+**Requiere autenticación**: Esta operación requiere el header `Authorization`
+con un token Bearer válido. El ID del usuario se obtiene automáticamente del
+token, por lo que no es necesario enviarlo como parámetro.
 
 ```graphql
 mutation UpdateUser {
   updateUser(
-    userId: "user_id_aqui"
     userInput: {
       email: "nuevo@ejemplo.com"
       password: "newpassword123"
@@ -191,11 +214,15 @@ mutation SendPasswordReset {
 }
 ```
 
-#### 5. Eliminar usuario
+#### 5. Eliminar usuario 🔐
+
+**Requiere autenticación**: Esta operación requiere el header `Authorization`
+con un token Bearer válido. El ID del usuario se obtiene automáticamente del
+token, por lo que no es necesario enviarlo como parámetro.
 
 ```graphql
 mutation DeleteUser {
-  deleteUser(userId: "user_id_aqui")
+  deleteUser
 }
 ```
 
@@ -250,11 +277,48 @@ curl -X POST http://localhost:8000/graphql \
   }'
 ```
 
+3. **Actualizar usuario (requiere token de autorización)**:
+
+```bash
+curl -X POST http://localhost:8000/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <tu_token_jwt>" \
+  -d '{
+    "query": "mutation { updateUser(userInput: { email: \"updated@example.com\", alias: \"UpdatedUser\" }) { id email alias } }"
+  }'
+```
+
+4. **Eliminar usuario (requiere token de autorización)**:
+
+```bash
+curl -X POST http://localhost:8000/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <tu_token_jwt>" \
+  -d '{
+    "query": "mutation { deleteUser }"
+  }'
+```
+
 ### Usar GraphQL Playground
 
 1. Navega a http://localhost:8000/graphql
-2. Usa la interfaz web para escribir y ejecutar consultas
-3. Explora el schema usando la documentación integrada
+2. Para operaciones que requieren autenticación, configura el header en la
+   sección "HTTP Headers":
+   ```json
+   {
+     "Authorization": "Bearer <tu_token_jwt>"
+   }
+   ```
+3. Usa la interfaz web para escribir y ejecutar consultas
+4. Explora el schema usando la documentación integrada
+
+### Flujo completo de autenticación
+
+1. **Crear usuario** → Obtener datos del usuario
+2. **Login** → Obtener `idToken`
+3. **Usar token** → Incluir en header `Authorization: Bearer <idToken>` para
+   operaciones protegidas
+4. **Operaciones protegidas** → Actualizar perfil, eliminar cuenta
 
 ## 🏗️ Arquitectura del Proyecto
 
@@ -262,13 +326,46 @@ curl -X POST http://localhost:8000/graphql \
 
 - **Dominio** (`src/domain/`): Entidades y reglas de negocio
 - **Aplicación** (`src/application/`): Casos de uso y coordinación
-- **Infraestructura** (`src/infrastructure/`): Implementaciones concretas
+- **Infraestructura** (`src/infraestructure/`): Implementaciones concretas
+
+### Sistema de Autenticación
+
+El servicio implementa un sistema de autenticación basado en headers que
+incluye:
+
+#### Context Management (`context.py`)
+
+- **Función**: Extrae el header `Authorization` de las peticiones HTTP
+- **Formato esperado**: `Authorization: Bearer <token>`
+- **Procesamiento**: Separa el tipo de autorización ("Bearer") del token JWT
+
+#### Decorador de Autorización (`decorators.py`)
+
+- **`@login_required`**: Decorador que protege endpoints GraphQL
+- **Validación**: Verifica que el header sea válido y el token esté presente
+- **Verificación**: Valida el token JWT con Firebase
+- **Context**: Añade el token verificado al contexto de GraphQL para uso
+  posterior
+
+#### Flujo de Autenticación
+
+1. **Cliente** → Envía petición con header `Authorization: Bearer <token>`
+2. **Context** → Extrae y procesa el header
+3. **Decorador** → Valida formato y verifica token con Firebase
+4. **Endpoint** → Accede al usuario autenticado desde el contexto
+5. **Respuesta** → Retorna datos sin exponer información de otros usuarios
+
+### Endpoints Protegidos
+
+- **`updateUser`**: Actualiza el usuario autenticado (ID extraído del token)
+- **`deleteUser`**: Elimina el usuario autenticado (ID extraído del token)
 
 ### Tecnologías Utilizadas
 
 - **FastAPI**: Framework web moderno para Python
 - **Strawberry GraphQL**: Librería GraphQL para Python
 - **Firebase**: Backend de autenticación y base de datos
+- **JWT**: Tokens de autenticación
 - **Uvicorn**: Servidor ASGI
 - **Docker**: Containerización
 - **Pytest**: Framework de testing
@@ -285,9 +382,13 @@ authentication-service/
 │   ├── application/
 │   │   ├── user_use_cases.py  # Casos de uso de usuarios
 │   │   └── token_use_cases.py # Casos de uso de tokens
-│   └── infrastructure/
+│   └── infraestructure/
 │       ├── db/                # Configuración Firebase
 │       ├── graphql/           # Schema y tipos GraphQL
+│       │   ├── context.py     # Manejo del contexto y headers de autenticación
+│       │   ├── decorators.py  # Decorador @login_required para endpoints protegidos
+│       │   ├── schema.py      # Definición de queries y mutations
+│       │   └── types.py       # Tipos GraphQL
 │       ├── repositories/      # Implementaciones de repositorios
 │       └── rest/              # APIs REST adicionales
 ├── tests/                     # Tests unitarios e integración

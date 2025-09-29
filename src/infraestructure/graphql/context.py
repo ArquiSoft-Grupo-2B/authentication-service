@@ -9,3 +9,5 @@ async def get_context(request: Request):
     if auth_header:
         header_parts = auth_header.split(" ")
         return {"auth_header": header_parts}
+    else:
+        return {"auth_header": ["", ""]}  # Default empty header parts

@@ -80,8 +80,9 @@ class Mutation:
 
     @strawberry.mutation
     @login_required
-    def delete_user(self, info, user_id: str) -> bool:
+    def delete_user(self, info: Info) -> bool:
         try:
+            user_id = info.context.get("verified_token").get("uid")
             user_use_cases.delete_user(user_id)
             return True
         except Exception:

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 from ..entities.token import Token
+from ..entities.refresh_token import RefreshToken
 
 
 class TokenRepository(ABC):
@@ -10,7 +11,5 @@ class TokenRepository(ABC):
         pass
 
     @abstractmethod
-    def refresh_token(
-        self, old_token_str: str, new_token_str: str, expires_in: int
-    ) -> Token:
+    def refresh_token(self, refresh_token: str) -> RefreshToken:
         pass

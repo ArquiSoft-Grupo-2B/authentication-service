@@ -1,6 +1,8 @@
 import strawberry
+from strawberry.types import Info
 from src.application.user_use_cases import UserUseCases
 from src.application.token_use_cases import TokenUseCases
+from .decorators import login_required
 from src.infraestructure.graphql.types import (
     UserType,
     UserInput,
@@ -8,6 +10,7 @@ from src.infraestructure.graphql.types import (
     PasswordResetResponse,
     userInfoType,
     decodedTokenType,
+    TokenRefreshType,
 )
 
 # from src.infraestructure.repositories.in_memory_user_repository import InMemoryUserRepository
@@ -56,7 +59,10 @@ class Mutation:
         return None
 
     @strawberry.mutation
-    def update_user(self, user_id: str, user_input: UserInput) -> UserType | None:
+    @login_required
+    def update_user(self, info: Info, user_input: UserInput) -> UserType | None:
+        decoded_token = info.context.get("verified_token")
+        user_id = decoded_token.get("uid")
         user_data = {
             "id": user_id,
             "email": user_input.email,
@@ -74,8 +80,10 @@ class Mutation:
         return PasswordResetResponse(**reset_confirmation)
 
     @strawberry.mutation
-    def delete_user(self, user_id: str) -> bool:
+    @login_required
+    def delete_user(self, info: Info) -> bool:
         try:
+            user_id = info.context.get("verified_token").get("uid")
             user_use_cases.delete_user(user_id)
             return True
         except Exception:
@@ -91,6 +99,13 @@ class Mutation:
                 email_verified=token_data.get("email_verified"),
                 user_info=userInfoType(**token_data.get("user_info")),
             )
+        return None
+
+    @strawberry.mutation
+    def refresh_token(self, refresh_token: str) -> TokenRefreshType | None:
+        new_token_data = token_use_cases.refresh_token(refresh_token)
+        if new_token_data:
+            return TokenRefreshType(**new_token_data)
         return None
 
 

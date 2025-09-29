@@ -16,6 +16,8 @@ usuarios y autenticación:
   headers
 - **Verificación de tokens**: Validación y decodificación de tokens de
   autenticación
+- **Refresh tokens**: Renovación automática de tokens de acceso sin requerir
+  reautenticación
 - **Recuperación de contraseña**: Envío de emails para restablecer contraseña
 - **Backend Firebase**: Integración completa con Firebase Authentication y
   Firestore
@@ -254,6 +256,22 @@ mutation VerifyToken {
 }
 ```
 
+#### 7. Renovar token de acceso
+
+```graphql
+mutation RefreshToken {
+  refreshToken(refreshToken: "refresh_token_aqui") {
+    accessToken
+    expiresIn
+    tokenType
+    refreshToken
+    idToken
+    userId
+    projectId
+  }
+}
+```
+
 ## 🌐 Endpoints REST
 
 ### Endpoint principal
@@ -311,6 +329,16 @@ curl -X POST http://localhost:8000/graphql \
   }'
 ```
 
+5. **Renovar token de acceso**:
+
+```bash
+curl -X POST http://localhost:8000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation { refreshToken(refreshToken: \"<tu_refresh_token>\") { idToken accessToken expiresIn refreshToken } }"
+  }'
+```
+
 ### Usar GraphQL Playground
 
 1. Navega a http://localhost:8000/graphql
@@ -327,10 +355,19 @@ curl -X POST http://localhost:8000/graphql \
 ### Flujo completo de autenticación
 
 1. **Crear usuario** → Obtener datos del usuario
-2. **Login** → Obtener `idToken`
+2. **Login** → Obtener `idToken` y `refreshToken`
 3. **Usar token** → Incluir en header `Authorization: Bearer <idToken>` para
    operaciones protegidas
-4. **Operaciones protegidas** → Actualizar perfil, eliminar cuenta
+4. **Token expirado** → Usar `refreshToken` para obtener nuevo `idToken` sin
+   reautenticación
+5. **Operaciones protegidas** → Actualizar perfil, eliminar cuenta
+
+### Gestión de tokens
+
+- **idToken**: Token de acceso con tiempo de vida limitado (1 hora)
+- **refreshToken**: Token de larga duración para renovar el `idToken`
+- **Flujo de renovación**: Cuando el `idToken` expira, usa el `refreshToken`
+  para obtener uno nuevo sin requerir login
 
 ## 🏗️ Arquitectura del Proyecto
 

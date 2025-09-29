@@ -10,7 +10,6 @@ class TokenAuthRepository(TokenRepository):
         # Implement token verification logic here
         try:
             decoded_token = auth.verify_id_token(id_token)
-            print(f"Decoded token: {decoded_token}")
             token_data = {
                 "uid": decoded_token.get("uid"),
                 "email": decoded_token.get("email"),

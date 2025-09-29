@@ -21,9 +21,13 @@ class TokenAuthRepository(TokenRepository):
                 },
             }
             return token_data
+
+        except auth.ExpiredIdTokenError:
+            raise ValueError("Expired token")
+        except auth.InvalidIdTokenError:
+            raise ValueError("Invalid token")
         except Exception as e:
-            print(f"Token verification failed: {e}")
-            return None
+            raise ValueError(f"Error verifying token: {str(e)}")
 
     def refresh_token(
         self, old_token_str: str, new_token_str: str, expires_in: int

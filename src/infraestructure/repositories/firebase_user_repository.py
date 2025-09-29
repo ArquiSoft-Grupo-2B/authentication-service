@@ -67,7 +67,9 @@ class FirebaseUserRepository(UserRepository):
                 alias=alias,
             )
         except firebase_admin._auth_utils.UserNotFoundError:
-            raise firebase_admin._auth_utils.UserNotFoundError("User not found")
+            raise ValueError("User not found")
+        except Exception as e:
+            raise ValueError(f"Error retrieving user: {str(e)}")
 
     def get_user_by_email(self, email: str) -> Optional[User]:
         """Get user by email using Auth and Firestore."""

@@ -1,5 +1,6 @@
 from ..repositories.token_repository import TokenRepository
 from ..entities.token import Token
+from ..entities.refresh_token import RefreshToken
 from typing import Optional
 
 
@@ -14,10 +15,6 @@ class TokenService:
         """Verify a token."""
         return self.token_repository.verify_token(id_token)
 
-    def refresh_token(
-        self, old_token_str: str, new_token_str: str, expires_in: int
-    ) -> Token:
+    def refresh_token(self, refresh_token: str) -> RefreshToken:
         """Refresh an existing token."""
-        return self.token_repository.refresh_token(
-            old_token_str, new_token_str, expires_in
-        )
+        return self.token_repository.refresh_token(refresh_token)

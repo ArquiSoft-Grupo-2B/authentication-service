@@ -1,7 +1,9 @@
 from ...domain.repositories.token_repository import TokenRepository
 from ...domain.entities.token import Token
+from ...domain.entities.refresh_token import RefreshToken
 from typing import Optional
 from firebase_admin import auth
+from ..rest.firebase_auth_api import FirebaseAuthAPI
 
 
 class TokenAuthRepository(TokenRepository):
@@ -28,8 +30,10 @@ class TokenAuthRepository(TokenRepository):
         except Exception as e:
             raise ValueError(f"Error verifying token: {str(e)}")
 
-    def refresh_token(
-        self, old_token_str: str, new_token_str: str, expires_in: int
-    ) -> Token:
-        # Implement token refresh logic here
-        pass
+    def refresh_token(self, refresh_token: str) -> RefreshToken:
+        firebase_api = FirebaseAuthAPI()
+        try:
+            new_tokens = firebase_api.refresh_id_token(refresh_token)
+            return new_tokens
+        except ValueError as e:
+            raise ValueError(f"Error refreshing token: {str(e)}")

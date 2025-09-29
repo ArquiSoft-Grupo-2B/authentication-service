@@ -10,6 +10,7 @@ from src.infraestructure.graphql.types import (
     PasswordResetResponse,
     userInfoType,
     decodedTokenType,
+    TokenRefreshType,
 )
 
 # from src.infraestructure.repositories.in_memory_user_repository import InMemoryUserRepository
@@ -98,6 +99,13 @@ class Mutation:
                 email_verified=token_data.get("email_verified"),
                 user_info=userInfoType(**token_data.get("user_info")),
             )
+        return None
+
+    @strawberry.mutation
+    def refresh_token(self, refresh_token: str) -> TokenRefreshType | None:
+        new_token_data = token_use_cases.refresh_token(refresh_token)
+        if new_token_data:
+            return TokenRefreshType(**new_token_data)
         return None
 
 

@@ -13,10 +13,6 @@ class TokenUseCases:
         token = self.token_service.verify_token(id_token)
         return token if token else None
 
-    def refresh_token(
-        self, old_token_str: str, new_token_str: str, expires_in: int
-    ) -> dict:
-        token = self.token_service.refresh_token(
-            old_token_str, new_token_str, expires_in
-        )
+    def refresh_token(self, refresh_token: str) -> dict:
+        token = self.token_service.refresh_token(refresh_token)
         return token

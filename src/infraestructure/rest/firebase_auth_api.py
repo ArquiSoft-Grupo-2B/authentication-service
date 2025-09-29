@@ -35,4 +35,4 @@ class FirebaseAuthAPI:
         response = requests.post(url, json=payload)
         if response.status_code == 200:
             return {"success": True, "response": response.json().get("email")}
-        return {"success": False, "response": response.json()}
+        raise ValueError("Failed to send password reset email")

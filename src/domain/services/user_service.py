@@ -2,6 +2,7 @@ from typing import Optional, List
 from ..entities.user import User
 from ..entities.token import Token
 from ..repositories.user_repository import UserRepository
+from ...utils.validators import validate_email
 
 
 class UserService:
@@ -54,6 +55,10 @@ class UserService:
 
     def send_password_reset_email(self, email: str) -> dict:
         """Send a password reset email."""
+        if not validate_email(email):
+            raise ValueError("Invalid email format")
+        if not self.user_repository.get_user_by_email(email):
+            raise ValueError("No user found with this email")
         return self.user_repository.send_password_reset_email(email)
 
     def delete_user(self, user_id: str) -> None:

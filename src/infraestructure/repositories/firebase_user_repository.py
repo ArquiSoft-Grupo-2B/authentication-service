@@ -113,6 +113,8 @@ class FirebaseUserRepository(UserRepository):
             )
         except firebase_admin._auth_utils.UserNotFoundError:
             raise ValueError("User not found")
+        except Exception as e:
+            raise ValueError(f"Error updating user: {str(e)}")
 
     def send_password_reset_email(self, email: str) -> dict:
         """Send a password reset email using Firebase Auth REST API."""

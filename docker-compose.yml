@@ -27,5 +27,5 @@ services:
 
 networks:
   default:
-    name: routes-shared-network
+    name: routes_shared_network
     external: true

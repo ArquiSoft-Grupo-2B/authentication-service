@@ -1,40 +1,28 @@
 # Tests - Authentication Service
 
-Este directorio contiene las pruebas unitarias e integración para el servicio de
-autenticación.
+Este directorio contiene las pruebas unitarias para el servicio de autenticación,
+enfocándose exclusivamente en el dominio del sistema.
 
 ## Estructura de Pruebas
 
 ```
 tests/
 ├── domain/
-│   ├── entities/          # Pruebas de entidades del dominio
-│   └── services/          # Pruebas de servicios del dominio
-├── application/           # Pruebas de casos de uso
-├── infrastructure/        # Pruebas de repositorios en memoria
-├── test_integration.py    # Pruebas de integración completas
+│   ├── entities/          # Pruebas unitarias de entidades del dominio
+│   └── services/          # Pruebas unitarias de servicios del dominio
 └── conftest.py           # Configuración compartida de pytest
 ```
 
 ## Tipos de Pruebas
 
-### 🔧 Pruebas Unitarias
+### 🔧 Pruebas Unitarias del Dominio
 
-- **Entidades**: Validación de reglas de negocio en la clase `User`
-- **Servicios**: Lógica de negocio en `UserService`
-- **Repositorios**: Implementación en memoria de `InMemoryUserRepository`
-- **Casos de Uso**: Coordinación entre capas en `UserUseCases`
-
-### 🔄 Pruebas de Integración
-
-- Flujo completo a través de todas las capas
-- Consistencia de datos entre repositorio, servicio y casos de uso
-- Propagación de errores entre capas
-- Aislamiento entre instancias de repositorio
+- **Entidades**: Validación de reglas de negocio en las entidades del dominio (User)
+- **Servicios**: Lógica de negocio en servicios del dominio (UserService) usando mocks para repositorios
 
 ## Cómo Ejecutar las Pruebas
 
-### Todas las pruebas
+### Todas las pruebas unitarias
 
 ```bash
 python -m pytest tests/ -v
@@ -43,40 +31,39 @@ python -m pytest tests/ -v
 ### Con reporte de cobertura
 
 ```bash
-python -m pytest tests/ --cov=src --cov-report=term-missing
+python -m pytest tests/ --cov=src/domain --cov-report=term-missing
 ```
 
-### Solo pruebas unitarias
+### Solo pruebas de entidades
 
 ```bash
-python -m pytest tests/domain/ tests/application/ tests/infrastructure/ -v
+python -m pytest tests/domain/entities/ -v
 ```
 
-### Solo pruebas de integración
+### Solo pruebas de servicios
 
 ```bash
-python -m pytest tests/test_integration.py -v
+python -m pytest tests/domain/services/ -v
 ```
 
 ### Generar reporte HTML de cobertura
 
 ```bash
-python -m pytest tests/ --cov=src --cov-report=html:htmlcov
+python -m pytest tests/ --cov=src/domain --cov-report=html:htmlcov
+```
+
 ```
 
 ## Herramientas Utilizadas
 
 - **pytest**: Framework de pruebas
 - **pytest-cov**: Reporte de cobertura de código
-- **InMemoryUserRepository**: Repositorio en memoria para pruebas aisladas
+- **unittest.mock**: Mocking para aislar unidades de código bajo prueba
 
 ## Cobertura Actual
 
-- **Total**: ~95% de cobertura de código
-- **Entidades**: 100%
-- **Servicios**: 100%
-- **Casos de Uso**: 100%
-- **Repositorios**: 100%
+- **Entidades**: 100% de cobertura
+- **Servicios**: 100% de cobertura del dominio
 
-Las líneas no cubiertas corresponden principalmente a métodos abstractos del
-repositorio base.
+Las pruebas se enfocan exclusivamente en el dominio del sistema, evitando
+dependencias externas y manteniendo la pureza arquitectónica.

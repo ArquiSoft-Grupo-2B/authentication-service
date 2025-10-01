@@ -40,7 +40,12 @@ class UserService:
 
     def update_user(self, user: User) -> User:
         """Update an existing user after validation."""
-        if not user.validate():
+        not_password = user.password is None
+        not_alias = user.alias is None
+
+        if not user.validate(
+            exclude_password=not_password, exclude_alias=not_alias
+        ):  # Exclude password and alias from validation
             raise ValueError("Invalid user data")
         existing_user = self.user_repository.get_user(user.id)
         if not existing_user:

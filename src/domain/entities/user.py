@@ -16,15 +16,19 @@ class User:
     alias: Optional[str] = None
     photo_url: str | None = None
 
-    def validate(self) -> bool:
+    def validate(
+        self, exclude_password: bool = False, exclude_alias: bool = False
+    ) -> bool:
         """Validate user data according to business rules."""
         if not self.email or not self._is_valid_email(self.email):
             return False
 
-        if self.alias is not None and len(self.alias.strip()) == 0:
+        if not exclude_alias and (
+            self.alias is not None and len(self.alias.strip()) == 0
+        ):
             return False
 
-        if not self.password or len(self.password) < 8:
+        if not exclude_password and (not self.password or len(self.password) < 8):
             return False
 
         return True

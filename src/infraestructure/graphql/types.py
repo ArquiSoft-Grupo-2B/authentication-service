@@ -12,7 +12,7 @@ class UserType:
 @strawberry.input
 class UserInput:
     email: str
-    password: str
+    password: str | None = None
     alias: str | None = None
 
 

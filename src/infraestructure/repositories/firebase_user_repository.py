@@ -94,16 +94,16 @@ class FirebaseUserRepository(UserRepository):
             user_record = auth_client.update_user(
                 user.id,
                 email=user.email,
-                display_name=user.alias,
+                display_name=user.alias if user.alias else None,
                 password=user.password if user.password else None,
             )
 
-            db.collection("users").document(user.id).update(
-                {
-                    "email": user.email,
-                    "alias": user.alias,
-                }
-            )
+            if user.alias is None:
+                update_data = {"email": user.email}
+            else:
+                update_data = {"email": user.email, "alias": user.alias}
+
+            db.collection("users").document(user.id).update(update_data)
 
             return User(
                 id=user_record.uid,

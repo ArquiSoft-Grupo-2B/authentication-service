@@ -1,18 +1,18 @@
-from ..domain.services.token_service import TokenService
 from ..domain.repositories.token_repository import TokenRepository
-from typing import Optional
+from ..domain.entities.token import Token
+from ..domain.entities.refresh_token import RefreshToken
 
 
 class TokenUseCases:
     """Use cases for managing tokens, coordinating between service and repository layers."""
 
     def __init__(self, token_repository: TokenRepository):
-        self.token_service = TokenService(token_repository)
+        self.token_repository = token_repository
 
-    def verify_token(self, id_token: str) -> Optional[dict]:
-        token = self.token_service.verify_token(id_token)
-        return token if token else None
+    def verify_token(self, id_token: str) -> dict | None:
+        token: Token = self.token_repository.verify_token(id_token)
+        return token.to_dict() if token else None
 
-    def refresh_token(self, refresh_token: str) -> dict:
-        token = self.token_service.refresh_token(refresh_token)
-        return token
+    def refresh_token(self, refresh_token: str) -> RefreshToken | None:
+        refresh_token: RefreshToken = self.token_service.refresh_token(refresh_token)
+        return refresh_token if refresh_token else None

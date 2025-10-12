@@ -14,5 +14,5 @@ class TokenUseCases:
         return token.to_dict() if token else None
 
     def refresh_token(self, refresh_token: str) -> RefreshToken | None:
-        refresh_token: RefreshToken = self.token_service.refresh_token(refresh_token)
+        refresh_token: RefreshToken = self.token_repository.refresh_token(refresh_token)
         return refresh_token if refresh_token else None

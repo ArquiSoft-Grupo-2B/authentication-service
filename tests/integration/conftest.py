@@ -11,8 +11,8 @@ from src.infrastructure.repositories.firebase_user_repository import (
     FirebaseUserRepository,
 )
 from src.infrastructure.repositories.token_auth_repository import TokenAuthRepository
-from src.domain.services.user_service import UserService
-from src.domain.services.token_service import TokenService
+from src.application.user_use_cases import UserUseCases
+from src.application.token_use_cases import TokenUseCases
 from src.domain.entities.user import User
 
 # Load environment variables for testing
@@ -32,15 +32,15 @@ def token_repository():
 
 
 @pytest.fixture(scope="session")
-def user_service(firebase_user_repository):
-    """Create a user service with Firebase repository."""
-    return UserService(firebase_user_repository)
+def user_use_cases(firebase_user_repository):
+    """Create a user use cases with Firebase repository."""
+    return UserUseCases(firebase_user_repository)
 
 
 @pytest.fixture(scope="session")
-def token_service(token_repository):
-    """Create a token service with token repository."""
-    return TokenService(token_repository)
+def token_use_cases(token_repository):
+    """Create a token use cases with token repository."""
+    return TokenUseCases(token_repository)
 
 
 @pytest.fixture(scope="session")

@@ -1,9 +1,8 @@
 import strawberry
 from strawberry.types import Info
-from src.application.user_use_cases import UserUseCases
-from src.application.token_use_cases import TokenUseCases
+from src.adapters.firebase_adapter import FirebaseAdapter
 from .decorators import login_required
-from src.infraestructure.graphql.types import (
+from src.interface.graphql.types import (
     UserType,
     UserInput,
     TokenType,
@@ -13,18 +12,10 @@ from src.infraestructure.graphql.types import (
     TokenRefreshType,
 )
 
-# from src.infraestructure.repositories.in_memory_user_repository import InMemoryUserRepository
-from src.infraestructure.repositories.firebase_user_repository import (
-    FirebaseUserRepository,
-)
-from src.infraestructure.repositories.token_auth_repository import TokenAuthRepository
-
 # Inyección de dependencias
-# user_repository = InMemoryUserRepository()
-user_repository = FirebaseUserRepository()
-token_repository = TokenAuthRepository()
-user_use_cases = UserUseCases(user_repository)
-token_use_cases = TokenUseCases(token_repository)
+firebase_adapter = FirebaseAdapter()
+user_use_cases = firebase_adapter.user_use_cases
+token_use_cases = firebase_adapter.token_use_cases
 
 
 @strawberry.type

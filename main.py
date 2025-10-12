@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from strawberry.fastapi import GraphQLRouter
-from src.infraestructure.graphql.schema import schema
-from src.infraestructure.graphql.context import get_context
+from src.interface.graphql.schema import schema
+from src.interface.graphql.context import get_context
 
 app = FastAPI()
 

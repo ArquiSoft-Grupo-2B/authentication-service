@@ -7,7 +7,7 @@ import pytest
 import time
 from src.domain.entities.user import User
 from src.domain.services.user_service import UserService
-from src.infraestructure.repositories.firebase_user_repository import (
+from src.infrastructure.repositories.firebase_user_repository import (
     FirebaseUserRepository,
 )
 

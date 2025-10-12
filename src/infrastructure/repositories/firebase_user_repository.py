@@ -2,7 +2,7 @@ from typing import Optional, List
 from src.domain.repositories.user_repository import UserRepository
 from src.domain.entities.user import User
 from src.domain.entities.token import Token
-from src.infraestructure.db.firebase import auth_client, db
+from src.infrastructure.db.firebase import auth_client, db
 from ..rest.firebase_auth_api import FirebaseAuthAPI
 import firebase_admin
 

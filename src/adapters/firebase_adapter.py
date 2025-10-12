@@ -1,7 +1,7 @@
-from ..infraestructure.repositories.firebase_user_repository import (
+from ..infrastructure.repositories.firebase_user_repository import (
     FirebaseUserRepository,
 )
-from ..infraestructure.repositories.token_auth_repository import TokenAuthRepository
+from ..infrastructure.repositories.token_auth_repository import TokenAuthRepository
 from ..application.user_use_cases import UserUseCases
 from ..application.token_use_cases import TokenUseCases
 

@@ -7,10 +7,10 @@ import os
 import uuid
 from typing import List
 from dotenv import load_dotenv
-from src.infraestructure.repositories.firebase_user_repository import (
+from src.infrastructure.repositories.firebase_user_repository import (
     FirebaseUserRepository,
 )
-from src.infraestructure.repositories.token_auth_repository import TokenAuthRepository
+from src.infrastructure.repositories.token_auth_repository import TokenAuthRepository
 from src.domain.services.user_service import UserService
 from src.domain.services.token_service import TokenService
 from src.domain.entities.user import User

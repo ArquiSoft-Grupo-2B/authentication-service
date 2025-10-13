@@ -11,6 +11,10 @@ class UserUseCases:
 
     def create_user(self, email: str, password: str, alias: str | None = None) -> dict:
         """Create a new user."""
+        if not User.validate_email(email):
+            raise ValueError("Invalid email format")
+        if not User.validate_password(password):
+            raise ValueError("Invalid password format (minimum 8 characters)")
         existing_user = self.user_repository.get_user_by_email(email)
         if existing_user:
             raise ValueError("User with this email already exists")
@@ -20,6 +24,10 @@ class UserUseCases:
 
     def login_user(self, email: str, password: str) -> dict | None:
         """Log in a user."""
+        if not User.validate_email(email):
+            raise ValueError("Invalid email format")
+        if not User.validate_password(password):
+            raise ValueError("Invalid password format (minimum 8 characters)")
         existing_user = self.user_repository.get_user_by_email(email)
         if not existing_user:
             raise ValueError("No user found with this email")
@@ -35,16 +43,24 @@ class UserUseCases:
         """Get user by email."""
         return self.user_repository.get_user_by_email(email)
 
+    def _handle_update_input(self, user_data: dict) -> None:
+        if not user_data.get("id"):
+            raise ValueError("User ID is required for update")
+        new_email = user_data.get("email")
+        if new_email and not User.validate_email(new_email):
+            raise ValueError("Invalid email format")
+        new_password = user_data.get("password")
+        if new_password and not User.validate_password(new_password):
+            raise ValueError("Invalid password format (minimum 8 characters)")
+        new_alias = user_data.get("alias")
+        if new_alias is not None and not User.validate_alias(new_alias):
+            raise ValueError("Invalid alias format (3-30 characters)")
+
     def update_user(self, user_data: dict) -> None:
         """Update an existing user after validation."""
+        self._handle_update_input(user_data)
         user = User(**user_data)
-        not_password = user.password is None
-        not_alias = user.alias is None
 
-        if not user.validate(
-            exclude_password=not_password, exclude_alias=not_alias
-        ):  # Exclude password and alias from validation
-            raise ValueError("Invalid user data")
         existing_user = self.user_repository.get_user(user.id)
         if not existing_user:
             raise ValueError("User not found")

@@ -12,31 +12,64 @@ class User:
     id: str
     email: str
     password: str
-    # display_name según firebase, alias según historia de usuario
-    alias: Optional[str] = None
+    alias: str | None = None
     photo_url: str | None = None
 
-    def validate(
-        self, exclude_password: bool = False, exclude_alias: bool = False
-    ) -> bool:
+    def __init__(self, **kwargs):
+        self.id = kwargs.get("id", "")
+        self.email = kwargs.get("email", "")
+        self.password = kwargs.get("password", "")
+        self.alias = kwargs.get("alias")
+        self.photo_url = kwargs.get("photo_url")
+
+    def validate_user_complete(self) -> bool:
         """Validate user data according to business rules."""
-        if not self.email or not self._is_valid_email(self.email):
+        if not self.validate_email(self.email):
             return False
 
-        if not exclude_alias and (
-            self.alias is not None and len(self.alias.strip()) == 0
-        ):
+        if not self.validate_alias(self.alias):
             return False
 
-        if not exclude_password and (not self.password or len(self.password) < 8):
+        if not self.validate_password(self.password):
             return False
 
         return True
 
-    def _is_valid_email(self, email: str) -> bool:
+    def validate_user_login(self) -> bool:
+        """Validate user login data."""
+        if not self.validate_email(self.email):
+            return False
+
+        if not self.validate_password(self.password):
+            return False
+
+        return True
+
+    def validate_user_no_password(self) -> bool:
+        """Validate user data excluding password."""
+        if not self.validate_email(self.email):
+            return False
+
+        if not self.validate_alias(self.alias):
+            return False
+
+        return True
+
+    @staticmethod
+    def validate_email(email: str) -> bool:
         """Check if email format is valid."""
         email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.match(email_pattern, email) is not None
+
+    @staticmethod
+    def validate_password(password: str) -> bool:
+        """Validate the password against business rules."""
+        return bool(password) and len(password) >= 8
+
+    @staticmethod
+    def validate_alias(alias: Optional[str]) -> bool:
+        """Validate the alias against business rules."""
+        return bool(3 <= len(alias) <= 30)
 
     def to_dict_no_password(self) -> dict:
         """Convert user to dictionary excluding password."""

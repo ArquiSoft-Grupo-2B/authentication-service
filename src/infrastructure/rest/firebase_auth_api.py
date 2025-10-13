@@ -1,11 +1,11 @@
 from dotenv import load_dotenv
 from typing import Optional
+from src.domain.entities.refresh_token import RefreshToken
 import requests
 import os
 import json
 
-load_dotenv(dotenv_path="configs/.env")
-
+load_dotenv()
 firebase_api_key = os.getenv("API_KEY")
 
 
@@ -37,13 +37,15 @@ class FirebaseAuthAPI:
             return {"success": True, "response": response.json().get("email")}
         raise ValueError("Failed to send password reset email")
 
-    def refresh_id_token(self, refresh_token: str) -> Optional[dict]:
+    def refresh_id_token(self, refresh_token: str) -> Optional[RefreshToken]:
         """Refresh the ID token using the refresh token."""
 
         url = f"https://securetoken.googleapis.com/v1/token?key={self.api_key}"
         payload = {"grant_type": "refresh_token", "refresh_token": refresh_token}
         response = requests.post(url, data=payload)
         if response.status_code == 200:
-            return response.json()  # Contains new idToken, refreshToken, etc.
+            return RefreshToken(
+                **response.json()
+            )  # Contains new idToken, refreshToken, etc.
         else:
             raise ValueError("Failed to refresh ID token")

@@ -1,7 +1,7 @@
 import strawberry
 from strawberry.types import Info
 from graphql import GraphQLError
-from ..repositories.token_auth_repository import TokenAuthRepository
+from ...infrastructure.repositories.token_auth_repository import TokenAuthRepository
 from functools import wraps
 
 token_repository = TokenAuthRepository()

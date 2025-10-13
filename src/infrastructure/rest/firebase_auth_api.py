@@ -4,8 +4,7 @@ import requests
 import os
 import json
 
-load_dotenv(dotenv_path="configs/.env")
-
+load_dotenv()
 firebase_api_key = os.getenv("API_KEY")
 
 

@@ -16,7 +16,7 @@ from src.application.token_use_cases import TokenUseCases
 from src.domain.entities.user import User
 
 # Load environment variables for testing
-load_dotenv(dotenv_path="configs/.env")
+load_dotenv()
 
 
 @pytest.fixture(scope="session")

@@ -69,7 +69,7 @@ class User:
     @staticmethod
     def validate_alias(alias: Optional[str]) -> bool:
         """Validate the alias against business rules."""
-        return bool(3 <= len(alias) <= 30)
+        return alias != None and bool(3 <= len(alias.strip()) <= 30)
 
     def to_dict_no_password(self) -> dict:
         """Convert user to dictionary excluding password."""

@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import Mock
 from src.application.user_use_cases import UserUseCases
 from src.domain.entities.user import User
+from src.domain.entities.token import Token
 from src.domain.repositories.user_repository import UserRepository
 
 
@@ -64,15 +65,24 @@ class TestUserUseCases:
             password=password,
             alias="testuser",
         )
+        expected_token = Token(
+            local_id="user_123",
+            email=email,
+            alias="testuser",
+            id_token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            registered=True,
+            refresh_token="AEu4IL3yzb7...",
+            expires_in="3600",
+        )
 
         self.repository.get_user_by_email.return_value = expected_user
-        self.repository.login_user.return_value = expected_user
+        self.repository.login_user.return_value = expected_token
 
         # Act
         result = self.use_cases.login_user(email, password)
 
         # Assert
-        assert result == expected_user.to_dict_no_password()
+        assert result == expected_token.to_dict()
         self.repository.get_user_by_email.assert_called_once_with(email)
         self.repository.login_user.assert_called_once_with(email, password)
 
@@ -369,3 +379,57 @@ class TestUserUseCases:
         # Assert
         assert result == []
         self.repository.list_users.assert_called_once()
+
+    def test_create_user_invalid_email(self):
+        """Test creating a user with invalid email format raises ValueError."""
+        # Arrange
+        email = "invalid-email"
+        password = "password123"
+        alias = "testuser"
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Invalid email format"):
+            self.use_cases.create_user(email, password, alias)
+
+        self.repository.get_user_by_email.assert_not_called()
+        self.repository.create_user.assert_not_called()
+
+    def test_create_user_invalid_password(self):
+        """Test creating a user with invalid password raises ValueError."""
+        # Arrange
+        email = "test@example.com"
+        password = "short"  # Less than 8 characters
+        alias = "testuser"
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Invalid password format"):
+            self.use_cases.create_user(email, password, alias)
+
+        self.repository.get_user_by_email.assert_not_called()
+        self.repository.create_user.assert_not_called()
+
+    def test_login_user_invalid_email(self):
+        """Test logging in with invalid email format raises ValueError."""
+        # Arrange
+        email = "invalid-email"
+        password = "password123"
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Invalid email format"):
+            self.use_cases.login_user(email, password)
+
+        self.repository.get_user_by_email.assert_not_called()
+        self.repository.login_user.assert_not_called()
+
+    def test_login_user_invalid_password(self):
+        """Test logging in with invalid password raises ValueError."""
+        # Arrange
+        email = "test@example.com"
+        password = "short"  # Less than 8 characters
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Invalid password format"):
+            self.use_cases.login_user(email, password)
+
+        self.repository.get_user_by_email.assert_not_called()
+        self.repository.login_user.assert_not_called()

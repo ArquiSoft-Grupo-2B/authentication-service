@@ -1,4 +1,5 @@
 from ..domain.entities.user import User
+from ..domain.entities.token import Token
 from ..domain.repositories.user_repository import UserRepository
 
 
@@ -31,8 +32,8 @@ class UserUseCases:
         if not existing_user:
             raise ValueError("No user found with this email")
 
-        logged_user = self.user_repository.login_user(email, password)
-        return logged_user.to_dict() if logged_user else None
+        logged_user_token: Token = self.user_repository.login_user(email, password)
+        return logged_user_token.to_dict() if logged_user_token else None
 
     def get_user(self, user_id: str) -> dict | None:
         user = self.user_repository.get_user(user_id)
@@ -74,7 +75,7 @@ class UserUseCases:
         return updated_user.to_dict_no_password() if updated_user else None
 
     def send_password_reset_email(self, email: str) -> dict:
-        if not validate_email(email):
+        if not User.validate_email(email):
             raise ValueError("Invalid email format")
         if not self.user_repository.get_user_by_email(email):
             raise ValueError("No user found with this email")

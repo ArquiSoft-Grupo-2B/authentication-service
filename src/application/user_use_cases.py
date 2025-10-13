@@ -1,6 +1,5 @@
 from ..domain.entities.user import User
 from ..domain.repositories.user_repository import UserRepository
-from ..utils.validators import validate_email
 
 
 class UserUseCases:

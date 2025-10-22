@@ -11,7 +11,7 @@ class TokenUseCases:
 
     def verify_token(self, id_token: str) -> dict | None:
         token: Token = self.token_repository.verify_token(id_token)
-        return token.to_dict() if token else None
+        return token if token else None
 
     def refresh_token(self, refresh_token: str) -> RefreshToken | None:
         refresh_token: RefreshToken = self.token_repository.refresh_token(refresh_token)

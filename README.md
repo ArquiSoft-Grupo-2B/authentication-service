@@ -28,9 +28,11 @@ usuarios y autenticación:
 
 ```
 src/
-├── domain/           # Entidades de dominio, repositorios e interfaces
+├── domain/           # Entidades de dominio y repositorios abstractos
 ├── application/      # Casos de uso y lógica de aplicación
-└── infrastructure/   # Implementaciones concretas (Firebase, GraphQL, etc.)
+├── infrastructure/   # Implementaciones concretas (Firebase, BD, etc.)
+├── interface/        # Interfaces de entrada (GraphQL)
+└── adapters/         # Adaptadores externos (Firebase Auth API)
 ```
 
 ## 🚀 Instalación y Configuración
@@ -47,7 +49,7 @@ src/
    o acceder a uno ya existente.
 2. Habilita Authentication y Firestore Database
 3. Genera una clave de servicio y descarga el archivo JSON
-4. Configura las variables de entorno en `configs/.env`:
+4. Configura las variables de entorno en `.env` (en la raíz del proyecto):
 
 ```env
 FIREBASE_CREDENTIALS_JSON='{"type": "service_account", ...}'
@@ -64,13 +66,17 @@ API_KEY='tu_api_key_de_firebase'
    pip install -r requirements.txt
    ```
 
-2. **Ejecutar el servidor**:
+2. **Configurar variables de entorno**:
+   
+   Asegúrate de que el archivo `.env` esté en la raíz del proyecto con las variables necesarias.
+
+3. **Ejecutar el servidor**:
 
    ```bash
    uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
-3. **Acceder al servicio**:
+4. **Acceder al servicio**:
    - API: http://localhost:8000
    - GraphQL Playground: http://localhost:8000/graphql
 
@@ -369,32 +375,95 @@ curl -X POST http://localhost:8000/graphql \
 - **Flujo de renovación**: Cuando el `idToken` expira, usa el `refreshToken`
   para obtener uno nuevo sin requerir login
 
+## 🧪 Testing
+
+El proyecto incluye una suite completa de pruebas unitarias e integración:
+
+### Ejecutar todas las pruebas
+
+```bash
+python -m pytest
+```
+
+### Ejecutar pruebas con cobertura
+
+```bash
+python -m pytest --cov=src --cov-report=html
+```
+
+### Ejecutar pruebas específicas
+
+```bash
+# Pruebas de dominio
+python -m pytest tests/domain/
+
+# Pruebas de aplicación  
+python -m pytest tests/application/
+
+# Pruebas de integración
+python -m pytest tests/integration/
+```
+
+### Estructura de Testing
+
+- **`tests/domain/`**: Pruebas unitarias de entidades y validaciones
+- **`tests/application/`**: Pruebas de casos de uso y lógica de aplicación
+- **`tests/integration/`**: Pruebas de integración con Firebase y servicios externos
+
+### Características de Testing
+
+- **Mocking**: Uso de mocks para aislar unidades de código
+- **Fixtures**: Configuración reutilizable de datos de prueba
+- **Cobertura**: Medición de cobertura de código
+- **Validaciones**: Pruebas exhaustivas de métodos de validación estáticos
+
 ## 🏗️ Arquitectura del Proyecto
 
 ### Capas de la Arquitectura Hexagonal
 
-- **Dominio** (`src/domain/`): Entidades y reglas de negocio
-- **Aplicación** (`src/application/`): Casos de uso y coordinación
-- **Infraestructura** (`src/infraestructure/`): Implementaciones concretas
+- **Dominio** (`src/domain/`): Entidades y reglas de negocio, repositorios abstractos
+- **Aplicación** (`src/application/`): Casos de uso y coordinación entre capas
+- **Infraestructura** (`src/infrastructure/`): Implementaciones concretas de repositorios y BD
+- **Interface** (`src/interface/`): Interfaces de entrada (GraphQL schema, context, decorators)
+- **Adaptadores** (`src/adapters/`): Adaptadores para servicios externos (Firebase Auth API)
 
 ### Sistema de Autenticación
 
 El servicio implementa un sistema de autenticación basado en headers que
 incluye:
 
-#### Context Management (`context.py`)
+#### Context Management (`src/interface/graphql/context.py`)
 
 - **Función**: Extrae el header `Authorization` de las peticiones HTTP
 - **Formato esperado**: `Authorization: Bearer <token>`
 - **Procesamiento**: Separa el tipo de autorización ("Bearer") del token JWT
 
-#### Decorador de Autorización (`decorators.py`)
+#### Decorador de Autorización (`src/interface/graphql/decorators.py`)
 
 - **`@login_required`**: Decorador que protege endpoints GraphQL
 - **Validación**: Verifica que el header sea válido y el token esté presente
 - **Verificación**: Valida el token JWT con Firebase
 - **Context**: Añade el token verificado al contexto de GraphQL para uso
   posterior
+
+#### Adaptadores Externos (`src/adapters/`)
+
+- **Firebase Adapter**: Manejo de la conexión y configuración con Firebase
+- **Firebase Auth API**: Interacción directa con la API REST de Firebase Auth para operaciones como login, refresh tokens, y password reset
+
+#### Validaciones de Dominio
+
+Las entidades del dominio implementan métodos de validación estáticos que pueden utilizarse sin instanciar objetos:
+
+- **`User.validate_email(email: str)`**: Valida formato de email
+- **`User.validate_password(password: str)`**: Valida contraseña (mínimo 8 caracteres)  
+- **`User.validate_alias(alias: str)`**: Valida alias (3-30 caracteres)
+
+Además, la entidad User incluye métodos de validación específicos para diferentes contextos:
+
+- **`validate_user_complete()`**: Validación completa (email, password, alias)
+- **`validate_user_login()`**: Validación para login (email, password)
+- **`validate_user_no_password()`**: Validación excluyendo password (email, alias)
 
 #### Flujo de Autenticación
 
@@ -425,27 +494,32 @@ incluye:
 authentication-service/
 ├── src/
 │   ├── domain/
-│   │   ├── entities/          # User, Token
-│   │   ├── repositories/      # Interfaces de repositorios
-│   │   └── services/          # Servicios de dominio
+│   │   ├── entities/          # User, Token, RefreshToken
+│   │   └── repositories/      # Interfaces abstractas de repositorios
 │   ├── application/
 │   │   ├── user_use_cases.py  # Casos de uso de usuarios
 │   │   └── token_use_cases.py # Casos de uso de tokens
-│   └── infraestructure/
-│       ├── db/                # Configuración Firebase
-│       ├── graphql/           # Schema y tipos GraphQL
-│       │   ├── context.py     # Manejo del contexto y headers de autenticación
-│       │   ├── decorators.py  # Decorador @login_required para endpoints protegidos
-│       │   ├── schema.py      # Definición de queries y mutations
-│       │   └── types.py       # Tipos GraphQL
-│       ├── repositories/      # Implementaciones de repositorios
-│       └── rest/              # APIs REST adicionales
+│   ├── infrastructure/
+│   │   ├── db/                # Configuración Firebase
+│   │   ├── repositories/      # Implementaciones concretas de repositorios
+│   │   └── rest/              # APIs REST de Firebase
+│   ├── interface/
+│   │   └── graphql/           # Interfaz GraphQL
+│   │       ├── context.py     # Manejo del contexto y headers de autenticación
+│   │       ├── decorators.py  # Decorador @login_required para endpoints protegidos
+│   │       ├── schema.py      # Definición de queries y mutations
+│   │       └── types.py       # Tipos GraphQL
+│   └── adapters/
+│       └── firebase_adapter.py # Adaptador para servicios Firebase
 ├── tests/                     # Tests unitarios e integración
-├── configs/                   # Configuración (.env)
-├── main.py                    # Punto de entrada
-├── requirements.txt           # Dependencias
-├── Dockerfile                 # Configuración Docker
-└── docker-compose.yml         # Orquestación Docker
+│   ├── domain/               # Tests de entidades
+│   ├── application/          # Tests de casos de uso
+│   └── integration/          # Tests de integración
+├── .env                      # Variables de entorno (raíz del proyecto)
+├── main.py                   # Punto de entrada
+├── requirements.txt          # Dependencias
+├── Dockerfile               # Configuración Docker
+└── docker-compose.yml       # Orquestación Docker
 ```
 
 ## 🤝 Contribución

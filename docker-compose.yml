@@ -3,7 +3,7 @@ services:
     build: .
     container_name: authentication-service
     ports:
-      - "8000:8000"
+      - '8000:8000'
 
     env_file:
       - .env
@@ -27,5 +27,5 @@ services:
 
 networks:
   default:
-    name: routes_shared_network
+    name: backend_net
     external: true

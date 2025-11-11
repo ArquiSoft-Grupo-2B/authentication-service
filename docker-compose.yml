@@ -16,14 +16,6 @@ services:
         # Si cambia requirements.txt, obliga a reconstruir la imagen
         - action: rebuild
           path: requirements.txt
-    command: >
-      uvicorn main:app
-      --host 0.0.0.0
-      --port 8000
-      --reload
-
-    networks:
-      - backend_net
 
 networks:
   default:

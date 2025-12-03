@@ -15,22 +15,19 @@ spec:
         app: auth
     spec:
       containers:
-      - name: auth-container
-        image: us-central1-docker.pkg.dev/turnkey-cyclist-480023-j5/my-repo/authentication-service:latest
-        ports:
-        - containerPort: 8000
-
-        # Variables de entorno desde Secret
-        envFrom:
-          - secretRef:
-              name: auth-env
-
-        # Montar Secret como archivo
-        volumeMounts:
-          - name: firebase-credentials
-            mountPath: /creds  # ruta donde estará firebase.json
-            readOnly: true
-
+        - name: auth-container
+          image: us-central1-docker.pkg.dev/turnkey-cyclist-480023-j5/runpath-repo/auth-service:v2
+          ports:
+            - containerPort: 8000
+          # Variables de entorno desde Secret
+          envFrom:
+            - secretRef:
+                name: auth-env
+          # Montar Secret como archivo
+          volumeMounts:
+            - name: firebase-credentials
+              mountPath: /app/creds
+              readOnly: true
       # Declaración del Secret como volumen
       volumes:
         - name: firebase-credentials

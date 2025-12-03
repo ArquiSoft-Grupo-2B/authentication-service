@@ -49,10 +49,11 @@ src/
    o acceder a uno ya existente.
 2. Habilita Authentication y Firestore Database
 3. Genera una clave de servicio y descarga el archivo JSON
-4. Configura las variables de entorno en `.env` (en la raíz del proyecto):
+4. Coloca el archivo en la carpeta `creds/` de tu proyecto: (Si decides cambiar la posición, también es necesario modificar los volumenes en `docker-compose` y `k8s/auth-deployment`)
+5. Configura las variables de entorno en `.env` (en la raíz del proyecto):
 
 ```env
-FIREBASE_CREDENTIALS_JSON='{"type": "service_account", ...}'
+FIREBASE_CREDENTIALS_JSON=RUTA/A/JSON
 API_KEY='tu_api_key_de_firebase'
 ```
 
@@ -494,32 +495,37 @@ Además, la entidad User incluye métodos de validación específicos para difer
 authentication-service/
 ├── src/
 │   ├── domain/
-│   │   ├── entities/          # User, Token, RefreshToken
-│   │   └── repositories/      # Interfaces abstractas de repositorios
+│   │   ├── entities/          
+│   │   └── repositories/      
 │   ├── application/
-│   │   ├── user_use_cases.py  # Casos de uso de usuarios
-│   │   └── token_use_cases.py # Casos de uso de tokens
+│   │   ├── user_use_cases.py  
+│   │   └── token_use_cases.py 
 │   ├── infrastructure/
-│   │   ├── db/                # Configuración Firebase
-│   │   ├── repositories/      # Implementaciones concretas de repositorios
-│   │   └── rest/              # APIs REST de Firebase
+│   │   ├── db/                
+│   │   ├── repositories/      
+│   │   └── rest/              
 │   ├── interface/
-│   │   └── graphql/           # Interfaz GraphQL
-│   │       ├── context.py     # Manejo del contexto y headers de autenticación
-│   │       ├── decorators.py  # Decorador @login_required para endpoints protegidos
-│   │       ├── schema.py      # Definición de queries y mutations
-│   │       └── types.py       # Tipos GraphQL
+│   │   └── graphql/           
+│   │       ├── context.py     
+│   │       ├── decorators.py  
+│   │       ├── schema.py      
+│   │       └── types.py       
 │   └── adapters/
-│       └── firebase_adapter.py # Adaptador para servicios Firebase
-├── tests/                     # Tests unitarios e integración
-│   ├── domain/               # Tests de entidades
-│   ├── application/          # Tests de casos de uso
-│   └── integration/          # Tests de integración
-├── .env                      # Variables de entorno (raíz del proyecto)
-├── main.py                   # Punto de entrada
-├── requirements.txt          # Dependencias
-├── Dockerfile               # Configuración Docker
-└── docker-compose.yml       # Orquestación Docker
+│       └── firebase_adapter.py 
+├── tests/                     
+│   ├── domain/               
+│   ├── application/          
+│   └── integration/          
+├── k8s/                       # Carpeta nueva para Kubernetes
+│   ├── auth_deployment.yaml
+│   └── auth_service.yaml
+├── creds/                     # Carpeta de credenciales (preferible)
+│   └── firebase_credentials.json
+├── .env                      
+├── main.py                   
+├── requirements.txt          
+├── Dockerfile               
+└── docker-compose.yml        
 ```
 
 ## 🤝 Contribución

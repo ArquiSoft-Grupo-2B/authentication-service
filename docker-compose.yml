@@ -4,6 +4,10 @@ services:
     container_name: authentication-service
     env_file:
       - .env
+
+    volumes:
+      - ./creds/firebase_credentials.json:/app/creds/firebase_credentials.json:ro
+
     develop:
       watch:
         # Sincroniza tu código fuente automáticamente

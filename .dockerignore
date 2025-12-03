@@ -7,3 +7,5 @@ __pycache__/
 .vscode
 .git
 .gitignore
+k8s/
+creds/firebase_credentials.json

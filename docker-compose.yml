@@ -1,9 +1,17 @@
 services:
   authentication-service:
     build: .
+    image: authentication-service:latest
     container_name: authentication-service
     env_file:
       - .env
+
+    volumes:
+      - ./creds/firebase_credentials.json:/app/creds/firebase_credentials.json:ro
+
+    ports:
+      - "8000:8000"
+
     develop:
       watch:
         # Sincroniza tu código fuente automáticamente

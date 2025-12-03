@@ -4,11 +4,9 @@ from dotenv import load_dotenv
 import os
 import json
 load_dotenv()
-firebase_credentials_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
+firebase_credentials_path = os.getenv("FIREBASE_CREDENTIALS_PATH")
 
-
-cred_dict = json.loads(firebase_credentials_json)
-cred = credentials.Certificate(cred_dict)
+cred = credentials.Certificate(firebase_credentials_path)
 
 # Inicializar la app de Firebase si no está inicializada
 if not firebase_admin._apps:

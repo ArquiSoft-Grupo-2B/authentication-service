@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+  labels:
+    app: auth
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+      - name: auth-container
+        image: us-central1-docker.pkg.dev/turnkey-cyclist-480023-j5/my-repo/authentication-service:latest
+        ports:
+        - containerPort: 8000
+
+        # Variables de entorno desde Secret
+        envFrom:
+          - secretRef:
+              name: auth-env
+
+        # Montar Secret como archivo
+        volumeMounts:
+          - name: firebase-credentials
+            mountPath: /creds  # ruta donde estará firebase.json
+            readOnly: true
+
+      # Declaración del Secret como volumen
+      volumes:
+        - name: firebase-credentials
+          secret:
+            secretName: firebase-config

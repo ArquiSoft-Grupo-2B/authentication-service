@@ -8,3 +8,4 @@ __pycache__/
 .git
 .gitignore
 k8s/
+creds/firebase_credentials.json
